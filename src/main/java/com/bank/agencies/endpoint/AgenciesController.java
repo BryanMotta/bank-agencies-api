@@ -3,14 +3,13 @@ package com.bank.agencies.endpoint;
 import com.bank.agencies.converter.AgencyResponseConverter;
 import com.bank.agencies.domain.AgencyGatewayResponse;
 import com.bank.agencies.domain.AgencyResponse;
+import com.bank.agencies.repository.AgenciesRepository;
 import com.bank.agencies.usecase.FindAllAgenciesUseCase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +22,12 @@ public class AgenciesController {
 
     private final AgencyResponseConverter agencyResponseConverter;
 
-    public AgenciesController(FindAllAgenciesUseCase findAllAgenciesUseCase, AgencyResponseConverter agencyResponseConverter) {
+    private final AgenciesRepository agenciesRepository;
+
+    public AgenciesController(FindAllAgenciesUseCase findAllAgenciesUseCase, AgencyResponseConverter agencyResponseConverter, AgenciesRepository agenciesRepository) {
         this.findAllAgenciesUseCase = findAllAgenciesUseCase;
         this.agencyResponseConverter = agencyResponseConverter;
+        this.agenciesRepository = agenciesRepository;
     }
 
     @GetMapping
@@ -46,5 +48,23 @@ public class AgenciesController {
         Map<String, List<AgencyResponse>> agencyResponseGrouped = agencyResponseConverter.getAgencyResponseGrouped(agencies);
 
         return new ResponseEntity<>(agencyResponseGrouped, HttpStatus.OK);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Map<String, List<AgencyResponse>>> saveAgency() {
+
+        List<AgencyGatewayResponse> agencies = findAllAgenciesUseCase.execute();
+        List<AgencyResponse> agencyResponse = agencyResponseConverter.getAgencyResponse(agencies);
+        agenciesRepository.saveAll(agencyResponse);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/optimized")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Iterable<AgencyResponse>> findAllAgenciesOptimized() {
+
+        return new ResponseEntity<>(agenciesRepository.findAll(), HttpStatus.OK);
     }
 }

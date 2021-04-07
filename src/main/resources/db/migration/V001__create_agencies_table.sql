@@ -1,0 +1,9 @@
+CREATE TABLE agencies (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(150) NULL,
+  bank VARCHAR(150) NULL,
+  city VARCHAR(150) NULL,
+  state VARCHAR(150) NULL,
+  PRIMARY KEY (id));
+
+

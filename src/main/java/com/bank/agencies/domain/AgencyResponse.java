@@ -2,11 +2,19 @@ package com.bank.agencies.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "agencies")
 public class AgencyResponse implements Serializable {
 
     private static final long serialVersionUID = -7394339763238481398L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private String bank;
@@ -45,6 +53,9 @@ public class AgencyResponse implements Serializable {
         this.state = state;
     }
 
+    public Long getId() {
+        return id;
+    }
 
     public static final class AgencyResponseBuilder {
         private String name;
